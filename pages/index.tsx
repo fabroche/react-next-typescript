@@ -1,8 +1,30 @@
 import type {NextPage} from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
+import {LazyImage} from "../components/LazyImage";
+import {type MouseEventHandler, useState} from "react";
+import {random} from "lodash";
+
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        let r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+    const randomFoxNumber = () => random(1, 123)
 
 const Home: NextPage = () => {
+    // la api random fox solo tiene 124 imagenes
+
+    const [images, setImages] = useState<IFoxImageItem[]>([])
+
+    const onAddNewFox: MouseEventHandler<HTMLButtonElement> = (event) => {
+        event.preventDefault()
+        setImages([...images, {
+            id: generateUUID(),
+            url: `https://randomfox.ca/images/${randomFoxNumber()}.jpg`
+        }])
+    }
+
     return (
         <div>
             <Head>
@@ -15,6 +37,21 @@ const Home: NextPage = () => {
                 <h1 className="text-3xl font-bold underline">
                     Hello World on NextJS!
                 </h1>
+                <button
+                    onClick={onAddNewFox}
+
+                >Add Fox
+                </button>
+                <div className="flex flex-col gap-2 items-center justify-center ">
+                    {images.map(
+                        (image) => <LazyImage
+                            key={image.id}
+                            src={image.url}
+                            alt={`Random Fox Image #${image.id}`}
+                            onLazyLoad={(image) => console.log(image.src)}
+                        />
+                    )}
+                </div>
             </main>
 
             <footer>
